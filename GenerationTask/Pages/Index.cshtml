@@ -1,0 +1,65 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Generate Document</h2>
+            <form method="post">
+                <div class="form-group">
+                    <label for="documentType">Document Type:</label>
+                    <select class="form-control" id="documentType" asp-for="DocumentType">
+                        <option value="CV">CV</option>
+                        <option value="Message">Message</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Cover letter">Cover letter</option>
+                        <option value="Agreement">Agreement</option>
+                        <option value="Email">Email</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" id="name" asp-for="Name">
+                </div>
+                <div class="form-group">
+                    <label for="extraDetails">Extra Details:</label>
+                    <input type="text" class="form-control" id="extraDetails" asp-for="ExtraDetails">
+                </div>
+                <button type="submit" class="btn btn-primary">Generate</button>
+            </form>
+        </div>
+        <div class="col-md-12 mt-3">
+            <h2>Generated Result</h2>
+            <textarea class="form-control" rows="10" readonly>@Model.GeneratedResult</textarea>
+                <form method="post" asp-page-handler="DownloadPdf">
+                    <button type="submit" class="btn btn-primary">Download PDF</button>
+                </form>
+
+        </div>
+    </div>
+</div>
+
+</div>
+<script>
+    tinymce.init({
+        selector: 'textarea',
+        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss',
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        mergetags_list: [
+            { value: 'First.Name', title: 'First Name' },
+            { value: 'Email', title: 'Email' },
+        ],
+        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+    });
+</script>
+
+       
