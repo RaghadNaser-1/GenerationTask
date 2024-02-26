@@ -1,5 +1,8 @@
+using GenerationTask.Data;
+using GenerationTask.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using OpenAI_API;
 using OpenAI_API.Completions;
 using OpenAI_API.Models;
@@ -13,10 +16,13 @@ namespace GenerationTask.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
+        private readonly ApplicationDbContext _dbContext;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger, ApplicationDbContext dbContext)
         {
             _logger = logger;
+            _dbContext = dbContext;
+
         }
 
         public void OnGet()
@@ -41,9 +47,12 @@ namespace GenerationTask.Pages
                 return Page();
             }
 
-            var openai = new OpenAIAPI("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");
+            var openai = new OpenAIAPI("");
 
             string prompt = $"Hi ChatGPT, Please help me to write {DocumentType} for {Name}, keep in mind {ExtraDetails}";
+            TempData["Name"] = Name;
+            TempData["DocumentType"] = DocumentType;
+
 
             CompletionRequest completionRequest = new CompletionRequest();
             completionRequest.Prompt = prompt;
@@ -66,24 +75,57 @@ namespace GenerationTask.Pages
         {
             if (TempData["GeneratedResult"] is string generatedResult)
             {
+                var name = TempData["Name"]?.ToString() ?? "UnknownName";
+                var documentType = TempData["DocumentType"]?.ToString() ?? "UnknownDocumentType";
+                var fileName = $"{name}-{documentType}.pdf";
+
                 // Generate PDF from the retrieved generated result
                 byte[] pdfBytes = GeneratePdfFromText(generatedResult);
-                // Use the local variable, not the property
+
+                // Define the relative path for storing the PDFs (e.g., "wwwroot/pdf/")
+                string folderPath = "wwwroot/pdf/";
+                //string fileName = $"{Guid.NewGuid()}.pdf"; // Using a GUID to avoid filename conflicts
+                string relativePath = Path.Combine(folderPath, fileName);
+
+                // Ensure the directory exists
+                Directory.CreateDirectory(folderPath);
+
+                // Save the PDF file
+                await System.IO.File.WriteAllBytesAsync(relativePath, pdfBytes);
+
+                // Here, save the generated result text and PDF bytes to your database
+                var pdfFile = new GeneratedPdf
+                {
+                    FileName = fileName,
+                    Content = generatedResult, // Saving text content
+                   // Content = generatedResult.Substring(0, Math.Min(50, generatedResult.Length)), // Saving text content
+                   // Content = string.Join(" ", generatedResult.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Take(15)),
+
+                    PdfFile = pdfBytes, // Saving PDF bytes
+                    FilePath = relativePath,
+
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _dbContext.GeneratedPdfs.Add(pdfFile);
+                await _dbContext.SaveChangesAsync(); // Save changes asynchronously
 
                 // Set the file content type
                 string contentType = "application/pdf";
 
                 // Return the PDF as a file download
-                return File(pdfBytes, contentType, "generated_document.pdf");
+                return File(pdfBytes, contentType, fileName);
             }
             else
             {
                 // Handle the case where there is no generated result
-                // This could redirect to another page with an error message or simply return to the current page with a message.
                 TempData["ErrorMessage"] = "No content was generated to create a PDF.";
                 return RedirectToPage(); // Or however you prefer to handle this scenario.
             }
         }
+
+
+
 
 
         private byte[] GeneratePdfFromText(string text)

@@ -1,7 +1,15 @@
+using GenerationTask.Data;
+using Microsoft.EntityFrameworkCore;
+// Include other necessary using directives here
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// Ensure you're using builder.Configuration to access the configuration
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
