@@ -1,0 +1,19 @@
+﻿@page
+@model GenerationTask.Pages.ModifyFormModel
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="GeneratedPdf.FileName"></label>
+        <input asp-for="GeneratedPdf.FileName" class="form-control" />
+        <span asp-validation-for="GeneratedPdf.FileName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="GeneratedPdf.Content"></label>
+        <textarea asp-for="GeneratedPdf.Content" rows="5" class="form-control"></textarea>
+        <span asp-validation-for="GeneratedPdf.Content" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+@{
+}

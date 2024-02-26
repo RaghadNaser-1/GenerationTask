@@ -1,0 +1,58 @@
+﻿@page
+@model GenerationTask.Pages.Files.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>GeneratedPdf</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="GeneratedPdf.Id" />
+            <div class="form-group">
+                <label asp-for="GeneratedPdf.FileName" class="control-label"></label>
+                <input asp-for="GeneratedPdf.FileName" class="form-control" />
+                <span asp-validation-for="GeneratedPdf.FileName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GeneratedPdf.Content" class="control-label"></label>
+                <textarea asp-for="GeneratedPdf.Content" class="form-control"></textarea>
+                <span asp-validation-for="GeneratedPdf.Content" class="text-danger"></span>
+            </div>
+
+           <!-- <div class="form-group">
+                <label asp-for="GeneratedPdf.PdfFile" class="control-label"></label>
+                <input asp-for="GeneratedPdf.PdfFile" class="form-control" />
+                <span asp-validation-for="GeneratedPdf.PdfFile" class="text-danger"></span>
+             </div> -->
+
+            <div class="form-group">
+                <label asp-for="PdfFileUpload" class="control-label"></label>
+                <input type="file" asp-for="PdfFileUpload" class="form-control" />
+                <span asp-validation-for="PdfFileUpload" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="GeneratedPdf.CreatedAt" class="control-label"></label>
+                <input asp-for="GeneratedPdf.CreatedAt" class="form-control" />
+                <span asp-validation-for="GeneratedPdf.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
